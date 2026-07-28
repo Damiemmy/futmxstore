@@ -147,4 +147,4 @@ REST_FRAMEWORK={
         'rest_framework.filters.OrderingFilter'
     ]
 }
-AUTH_USER_MODEL='users.User'
+AUTH_USER_MODEL='authentication.User'
