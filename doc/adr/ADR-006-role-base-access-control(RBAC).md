@@ -1,4 +1,4 @@
-# ADR-003: Adopt Role-Based Access Control (RBAC)
+# ADR-006: Adopt Role-Based Access Control (RBAC)
 
 - **Status:** Accepted
 - **Date:** 2026-07-28
