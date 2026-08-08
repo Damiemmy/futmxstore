@@ -62,4 +62,147 @@
 #     create_at=models.DatetimeField(auto_add_now=True)
 
 
+from django.db import models
 
+
+class Faculty(models.Model):
+    name = models.CharField(
+        max_length=150,
+        unique=True,
+    )
+
+    slug = models.SlugField(
+        unique=True,
+    )
+
+    def __str__(self):
+        return self.name
+
+
+class Department(models.Model):
+    faculty = models.ForeignKey(
+        Faculty,
+        on_delete=models.CASCADE,
+        related_name="departments",
+    )
+
+    name = models.CharField(
+        max_length=150,
+    )
+
+    slug = models.SlugField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["faculty", "name"],
+                name="unique_department_per_faculty",
+            )
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+class Level(models.Model):
+    department = models.ForeignKey(
+        Department,
+        on_delete=models.CASCADE,
+        related_name="levels",
+    )
+
+    name = models.CharField(
+        max_length=20,
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["department", "name"],
+                name="unique_level_per_department",
+            )
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+class Semester(models.Model):
+    level = models.ForeignKey(
+        Level,
+        on_delete=models.CASCADE,
+        related_name="semesters",
+    )
+
+    name = models.CharField(
+        max_length=30,
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["level", "name"],
+                name="unique_semester_per_level",
+            )
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+class Course(models.Model):
+    semester = models.ForeignKey(
+        Semester,
+        on_delete=models.CASCADE,
+        related_name="courses",
+    )
+
+    code = models.CharField(
+        max_length=20,
+    )
+
+    title = models.CharField(
+        max_length=200,
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["semester", "code"],
+                name="unique_course_per_semester",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.code} - {self.title}"
+
+
+class Material(models.Model):
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="materials",
+    )
+
+    title = models.CharField(
+        max_length=200,
+    )
+
+    description = models.TextField(
+        blank=True,
+    )
+
+    file = models.FileField(
+        upload_to="materials/",
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
+
+    def __str__(self):
+        return self.title
